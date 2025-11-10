@@ -1180,8 +1180,132 @@ CollideConnected:   false,
 }
 
 // CreateDistanceJoint creates a distance joint
+func CreateDistanceJoint(worldId WorldId, def *DistanceJointDef) JointId {
+cDef := C.b2DefaultDistanceJointDef()
+cDef.base.bodyIdA = def.BodyIdA.id
+cDef.base.bodyIdB = def.BodyIdB.id
+cDef.base.localFrameA.p = C.b2Vec2{x: C.float(def.LocalAnchorA.X), y: C.float(def.LocalAnchorA.Y)}
+cDef.base.localFrameB.p = C.b2Vec2{x: C.float(def.LocalAnchorB.X), y: C.float(def.LocalAnchorB.Y)}
+cDef.length = C.float(def.Length)
+cDef.enableSpring = C.bool(def.EnableSpring)
+cDef.lowerSpringForce = C.float(def.LowerSpringForce)
+cDef.upperSpringForce = C.float(def.UpperSpringForce)
+cDef.hertz = C.float(def.Hertz)
+cDef.dampingRatio = C.float(def.DampingRatio)
+cDef.enableLimit = C.bool(def.EnableLimit)
+cDef.minLength = C.float(def.MinLength)
+cDef.maxLength = C.float(def.MaxLength)
+cDef.enableMotor = C.bool(def.EnableMotor)
+cDef.maxMotorForce = C.float(def.MaxMotorForce)
+cDef.motorSpeed = C.float(def.MotorSpeed)
+cDef.base.collideConnected = C.bool(def.CollideConnected)
+
+jointId := C.b2CreateDistanceJoint(worldId.id, &cDef)
+return JointId{id: jointId}
+}
+
+// CreateRevoluteJoint creates a revolute joint
+func CreateRevoluteJoint(worldId WorldId, def *RevoluteJointDef) JointId {
+cDef := C.b2DefaultRevoluteJointDef()
+cDef.base.bodyIdA = def.BodyIdA.id
+cDef.base.bodyIdB = def.BodyIdB.id
+cDef.base.localFrameA.p = C.b2Vec2{x: C.float(def.LocalAnchorA.X), y: C.float(def.LocalAnchorA.Y)}
+cDef.base.localFrameB.p = C.b2Vec2{x: C.float(def.LocalAnchorB.X), y: C.float(def.LocalAnchorB.Y)}
+cDef.referenceAngle = C.float(def.ReferenceAngle)
+cDef.enableLimit = C.bool(def.EnableLimit)
+cDef.lowerAngle = C.float(def.LowerAngle)
+cDef.upperAngle = C.float(def.UpperAngle)
+cDef.enableMotor = C.bool(def.EnableMotor)
+cDef.motorSpeed = C.float(def.MotorSpeed)
+cDef.maxMotorTorque = C.float(def.MaxMotorTorque)
+cDef.drawSize = C.float(def.DrawSize)
+cDef.base.collideConnected = C.bool(def.CollideConnected)
+
+jointId := C.b2CreateRevoluteJoint(worldId.id, &cDef)
+return JointId{id: jointId}
+}
+
+// CreatePrismaticJoint creates a prismatic joint
+func CreatePrismaticJoint(worldId WorldId, def *PrismaticJointDef) JointId {
+cDef := C.b2DefaultPrismaticJointDef()
+cDef.base.bodyIdA = def.BodyIdA.id
+cDef.base.bodyIdB = def.BodyIdB.id
+cDef.base.localFrameA.p = C.b2Vec2{x: C.float(def.LocalAnchorA.X), y: C.float(def.LocalAnchorA.Y)}
+cDef.base.localFrameB.p = C.b2Vec2{x: C.float(def.LocalAnchorB.X), y: C.float(def.LocalAnchorB.Y)}
+cDef.localAxisA = C.b2Vec2{x: C.float(def.LocalAxisA.X), y: C.float(def.LocalAxisA.Y)}
+cDef.referenceAngle = C.float(def.ReferenceAngle)
+cDef.enableLimit = C.bool(def.EnableLimit)
+cDef.lowerTranslation = C.float(def.LowerTranslation)
+cDef.upperTranslation = C.float(def.UpperTranslation)
+cDef.enableMotor = C.bool(def.EnableMotor)
+cDef.motorSpeed = C.float(def.MotorSpeed)
+cDef.maxMotorForce = C.float(def.MaxMotorForce)
+cDef.base.collideConnected = C.bool(def.CollideConnected)
+
+jointId := C.b2CreatePrismaticJoint(worldId.id, &cDef)
+return JointId{id: jointId}
+}
+
+// CreateWeldJoint creates a weld joint
+func CreateWeldJoint(worldId WorldId, def *WeldJointDef) JointId {
+cDef := C.b2DefaultWeldJointDef()
+cDef.base.bodyIdA = def.BodyIdA.id
+cDef.base.bodyIdB = def.BodyIdB.id
+cDef.base.localFrameA.p = C.b2Vec2{x: C.float(def.LocalAnchorA.X), y: C.float(def.LocalAnchorA.Y)}
+cDef.base.localFrameB.p = C.b2Vec2{x: C.float(def.LocalAnchorB.X), y: C.float(def.LocalAnchorB.Y)}
+cDef.referenceAngle = C.float(def.ReferenceAngle)
+cDef.linearHertz = C.float(def.LinearHertz)
+cDef.angularHertz = C.float(def.AngularHertz)
+cDef.linearDampingRatio = C.float(def.LinearDampingRatio)
+cDef.angularDampingRatio = C.float(def.AngularDampingRatio)
+cDef.base.collideConnected = C.bool(def.CollideConnected)
+
+jointId := C.b2CreateWeldJoint(worldId.id, &cDef)
+return JointId{id: jointId}
+}
+
+// CreateWheelJoint creates a wheel joint
+func CreateWheelJoint(worldId WorldId, def *WheelJointDef) JointId {
+cDef := C.b2DefaultWheelJointDef()
+cDef.base.bodyIdA = def.BodyIdA.id
+cDef.base.bodyIdB = def.BodyIdB.id
+cDef.base.localFrameA.p = C.b2Vec2{x: C.float(def.LocalAnchorA.X), y: C.float(def.LocalAnchorA.Y)}
+cDef.base.localFrameB.p = C.b2Vec2{x: C.float(def.LocalAnchorB.X), y: C.float(def.LocalAnchorB.Y)}
+cDef.localAxisA = C.b2Vec2{x: C.float(def.LocalAxisA.X), y: C.float(def.LocalAxisA.Y)}
+cDef.enableSpring = C.bool(def.EnableSpring)
+cDef.hertz = C.float(def.Hertz)
+cDef.dampingRatio = C.float(def.DampingRatio)
+cDef.enableLimit = C.bool(def.EnableLimit)
+cDef.lowerTranslation = C.float(def.LowerTranslation)
+cDef.upperTranslation = C.float(def.UpperTranslation)
+cDef.enableMotor = C.bool(def.EnableMotor)
+cDef.motorSpeed = C.float(def.MotorSpeed)
+cDef.maxMotorTorque = C.float(def.MaxMotorTorque)
+cDef.base.collideConnected = C.bool(def.CollideConnected)
+
+jointId := C.b2CreateWheelJoint(worldId.id, &cDef)
+return JointId{id: jointId}
+}
+
+// CreateMotorJoint creates a motor joint
+func CreateMotorJoint(worldId WorldId, def *MotorJointDef) JointId {
+cDef := C.b2DefaultMotorJointDef()
+cDef.base.bodyIdA = def.BodyIdA.id
+cDef.base.bodyIdB = def.BodyIdB.id
+cDef.linearOffset = C.b2Vec2{x: C.float(def.LinearOffset.X), y: C.float(def.LinearOffset.Y)}
+cDef.angularOffset = C.float(def.AngularOffset)
+cDef.maxForce = C.float(def.MaxForce)
+cDef.maxTorque = C.float(def.MaxTorque)
+cDef.correctionFactor = C.float(def.CorrectionFactor)
+cDef.base.collideConnected = C.bool(def.CollideConnected)
+
+jointId := C.b2CreateMotorJoint(worldId.id, &cDef)
+return JointId{id: jointId}
+}
+
+// DestroyJoint destroys a joint
 func DestroyJoint(jointId JointId) {
-C.b2DestroyJoint(jointId.id, C.bool(true))
+C.b2DestroyJoint(jointId.id)
 }
 
 // IsValid checks if a joint ID is valid
