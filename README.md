@@ -4,8 +4,8 @@ This repository provides Go bindings for the [Box2D](https://github.com/erincatt
 
 ## Structure
 
-- `box2d/` - Git submodule pointing to the upstream Box2D C library
-- `go-box2d/` - Go bindings and wrapper library
+- `box2d/` - Git submodule pointing to the upstream Box2D C library (for reference)
+- `go-box2d/` - Go bindings and wrapper library with vendored Box2D C source
 
 ## Box2D
 
@@ -43,38 +43,21 @@ Box2D is a 2D physics engine for games developed by Erin Catto.
 
 This repository provides Go bindings for Box2D using CGO. The Go library is located in the `go-box2d/` directory.
 
-### Getting Started
+### Installation
 
-1. Clone the repository with submodules:
-
-```bash
-git clone --recurse-submodules https://github.com/Advik-B/box2d-go.git
-cd box2d-go
-```
-
-2. Build the Box2D C library:
+Simply import the library and build your project:
 
 ```bash
-cd go-box2d/clib
-cmake .
-make
+go get github.com/Advik-B/box2d-go
 ```
 
-3. Run tests:
+That's it! The Box2D C library is automatically compiled when you build your Go project.
 
-```bash
-cd ..
-go test -v
-```
+### Prerequisites
 
-4. Try the examples:
-
-```bash
-cd examples
-go run hello_world.go
-```
-
-See [go-box2d/README.md](go-box2d/README.md) for detailed documentation and examples.
+- Go 1.16 or later
+- CGO enabled (default)
+- A C compiler (gcc, clang, msvc, etc.)
 
 ### Quick Example
 
@@ -89,6 +72,8 @@ defer box2d.DestroyWorld(worldId)
 // Create bodies and shapes...
 worldId.Step(1.0/60.0, 4)
 ```
+
+See [go-box2d/README.md](go-box2d/README.md) for detailed documentation and examples.
 
 ## Documentation
 

@@ -14,13 +14,6 @@
 # Go workspace file
 go.work
 
-# CMake build artifacts
-clib/CMakeFiles/
-clib/CMakeCache.txt
-clib/Makefile
-clib/cmake_install.cmake
-clib/*.a
-
 # IDE files
 .vscode/
 .idea/

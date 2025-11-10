@@ -4,7 +4,7 @@ Go bindings for the Box2D physics engine using CGO.
 
 ## Overview
 
-This library provides Go bindings to Box2D v3.2.0, a 2D physics engine for games. The bindings use CGO to interface with the native C library.
+This library provides Go bindings to Box2D v3.2.0, a 2D physics engine for games. The bindings use CGO to interface with the native C library, which is automatically compiled when you build your project.
 
 ## Features
 
@@ -14,25 +14,23 @@ This library provides Go bindings to Box2D v3.2.0, a 2D physics engine for games
 - Physics stepping with configurable substeps
 - Collision detection and response
 
-## Building
+## Installation
 
-The library requires CGO to be enabled and a C compiler to be available. The Box2D C library is built automatically using CMake.
+Simply use `go get`:
+
+```bash
+go get github.com/Advik-B/box2d-go
+```
+
+The Box2D C library is automatically compiled when you build your Go project.
 
 ### Prerequisites
 
 - Go 1.16 or later
-- CMake 3.22 or later
-- A C compiler (gcc, clang, etc.)
+- CGO enabled (default)
+- A C compiler (gcc, clang, msvc, etc.)
 
-### Installation
-
-```bash
-cd go-box2d/clib
-cmake .
-make
-cd ..
-go build
-```
+No need for CMake or manual build steps!
 
 ## Usage
 
