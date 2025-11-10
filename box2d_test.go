@@ -346,3 +346,465 @@ func TestJointId(t *testing.T) {
 	// If this compiles, the test passes
 }
 
+
+// TestWorldGravity tests getting and setting world gravity
+func TestWorldGravity(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+// Set new gravity
+newGravity := Vec2{X: 5.0, Y: -15.0}
+worldId.SetGravity(newGravity)
+
+// Get gravity and verify
+gravity := worldId.GetGravity()
+if math.Abs(float64(gravity.X-newGravity.X)) > 0.001 || math.Abs(float64(gravity.Y-newGravity.Y)) > 0.001 {
+t.Errorf("Expected gravity %v, got %v", newGravity, gravity)
+}
+}
+
+// TestWorldSleeping tests world sleeping enable/disable
+func TestWorldSleeping(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+// Disable sleeping
+worldId.EnableSleeping(false)
+if worldId.IsSleepingEnabled() {
+t.Error("Sleeping should be disabled")
+}
+
+// Enable sleeping
+worldId.EnableSleeping(true)
+if !worldId.IsSleepingEnabled() {
+t.Error("Sleeping should be enabled")
+}
+}
+
+// TestWorldCounters tests getting world counters
+func TestWorldCounters(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+// Create some bodies
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+
+for i := 0; i < 5; i++ {
+bodyId := worldId.CreateBody(&bodyDef)
+box := MakeBox(1.0, 1.0)
+shapeDef := DefaultShapeDef()
+bodyId.CreatePolygonShape(&shapeDef, &box)
+}
+
+counters := worldId.GetCounters()
+if counters.BodyCount != 5 {
+t.Errorf("Expected 5 bodies, got %d", counters.BodyCount)
+}
+if counters.ShapeCount != 5 {
+t.Errorf("Expected 5 shapes, got %d", counters.ShapeCount)
+}
+}
+
+// TestBodyVelocity tests body velocity operations
+func TestBodyVelocity(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+bodyId := worldId.CreateBody(&bodyDef)
+
+// Set linear velocity
+velocity := Vec2{X: 10.0, Y: 5.0}
+bodyId.SetLinearVelocity(velocity)
+
+// Get and verify
+gotVelocity := bodyId.GetLinearVelocity()
+if math.Abs(float64(gotVelocity.X-velocity.X)) > 0.001 || math.Abs(float64(gotVelocity.Y-velocity.Y)) > 0.001 {
+t.Errorf("Expected velocity %v, got %v", velocity, gotVelocity)
+}
+
+// Set angular velocity
+angularVelocity := float32(2.5)
+bodyId.SetAngularVelocity(angularVelocity)
+
+gotAngularVelocity := bodyId.GetAngularVelocity()
+if math.Abs(float64(gotAngularVelocity-angularVelocity)) > 0.001 {
+t.Errorf("Expected angular velocity %f, got %f", angularVelocity, gotAngularVelocity)
+}
+}
+
+// TestBodyMass tests body mass operations
+func TestBodyMass(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+bodyId := worldId.CreateBody(&bodyDef)
+
+// Add a shape with density
+box := MakeBox(2.0, 2.0)
+shapeDef := DefaultShapeDef()
+shapeDef.Density = 1.0
+bodyId.CreatePolygonShape(&shapeDef, &box)
+
+// Get mass - should be computed from shape
+mass := bodyId.GetMass()
+if mass == 0.0 {
+t.Error("Mass should be computed from shape")
+}
+
+// Get mass data
+massData := bodyId.GetMassData()
+if massData.Mass == 0.0 {
+t.Error("Mass data should have non-zero mass")
+}
+}
+
+// TestBodyDamping tests body damping  
+func TestBodyDamping(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+bodyId := worldId.CreateBody(&bodyDef)
+
+// Set linear damping
+linearDamping := float32(0.5)
+bodyId.SetLinearDamping(linearDamping)
+if math.Abs(float64(bodyId.GetLinearDamping()-linearDamping)) > 0.001 {
+t.Error("Linear damping not set correctly")
+}
+
+// Set angular damping
+angularDamping := float32(0.3)
+bodyId.SetAngularDamping(angularDamping)
+if math.Abs(float64(bodyId.GetAngularDamping()-angularDamping)) > 0.001 {
+t.Error("Angular damping not set correctly")
+}
+}
+
+// TestBodyGravityScale tests body gravity scale
+func TestBodyGravityScale(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+bodyId := worldId.CreateBody(&bodyDef)
+
+// Set gravity scale
+gravityScale := float32(2.0)
+bodyId.SetGravityScale(gravityScale)
+
+gotScale := bodyId.GetGravityScale()
+if math.Abs(float64(gotScale-gravityScale)) > 0.001 {
+t.Errorf("Expected gravity scale %f, got %f", gravityScale, gotScale)
+}
+}
+
+// TestBodySleep tests body sleep operations
+func TestBodySleep(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+bodyId := worldId.CreateBody(&bodyDef)
+
+// Check if awake (should be awake initially)
+if !bodyId.IsAwake() {
+t.Error("Body should be awake initially")
+}
+
+// Check if sleep is enabled
+if !bodyId.IsSleepEnabled() {
+t.Error("Sleep should be enabled by default")
+}
+
+// Disable sleep
+bodyId.EnableSleep(false)
+if bodyId.IsSleepEnabled() {
+t.Error("Sleep should be disabled")
+}
+}
+
+// TestBodyEnableDisable tests body enable/disable
+func TestBodyEnableDisable(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+bodyId := worldId.CreateBody(&bodyDef)
+
+// Should be enabled initially
+if !bodyId.IsEnabled() {
+t.Error("Body should be enabled initially")
+}
+
+// Disable
+bodyId.Disable()
+if bodyId.IsEnabled() {
+t.Error("Body should be disabled")
+}
+
+// Enable
+bodyId.Enable()
+if !bodyId.IsEnabled() {
+t.Error("Body should be enabled")
+}
+}
+
+// TestBodyTransformOperations tests body transform operations
+func TestBodyTransformOperations(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+bodyDef.Position = Vec2{X: 10.0, Y: 5.0}
+bodyId := worldId.CreateBody(&bodyDef)
+
+// Test GetTransform
+transform := bodyId.GetTransform()
+if math.Abs(float64(transform.Position.X-10.0)) > 0.001 || math.Abs(float64(transform.Position.Y-5.0)) > 0.001 {
+t.Errorf("Transform position incorrect: %v", transform.Position)
+}
+
+// Test world/local point conversion
+worldPoint := Vec2{X: 15.0, Y: 10.0}
+localPoint := bodyId.GetLocalPoint(worldPoint)
+backToWorld := bodyId.GetWorldPoint(localPoint)
+
+if math.Abs(float64(backToWorld.X-worldPoint.X)) > 0.01 || math.Abs(float64(backToWorld.Y-worldPoint.Y)) > 0.01 {
+t.Errorf("Point conversion failed: expected %v, got %v", worldPoint, backToWorld)
+}
+}
+
+// TestShapeDensity tests shape density operations
+func TestShapeDensity(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+bodyId := worldId.CreateBody(&bodyDef)
+
+box := MakeBox(1.0, 1.0)
+shapeDef := DefaultShapeDef()
+shapeDef.Density = 2.0
+shapeId := bodyId.CreatePolygonShape(&shapeDef, &box)
+
+// Get density
+density := shapeId.GetDensity()
+if math.Abs(float64(density-2.0)) > 0.001 {
+t.Errorf("Expected density 2.0, got %f", density)
+}
+
+// Set new density
+shapeId.SetDensity(3.0, true)
+density = shapeId.GetDensity()
+if math.Abs(float64(density-3.0)) > 0.001 {
+t.Errorf("Expected density 3.0, got %f", density)
+}
+}
+
+// TestShapeFriction tests shape friction operations
+func TestShapeFriction(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyId := worldId.CreateBody(&bodyDef)
+
+box := MakeBox(1.0, 1.0)
+shapeDef := DefaultShapeDef()
+shapeDef.Friction = 0.5
+shapeId := bodyId.CreatePolygonShape(&shapeDef, &box)
+
+// Get friction
+friction := shapeId.GetFriction()
+if math.Abs(float64(friction-0.5)) > 0.001 {
+t.Errorf("Expected friction 0.5, got %f", friction)
+}
+
+// Set new friction
+shapeId.SetFriction(0.8)
+friction = shapeId.GetFriction()
+if math.Abs(float64(friction-0.8)) > 0.001 {
+t.Errorf("Expected friction 0.8, got %f", friction)
+}
+}
+
+// TestShapeFilter tests shape collision filters
+func TestShapeFilter(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyId := worldId.CreateBody(&bodyDef)
+
+box := MakeBox(1.0, 1.0)
+shapeDef := DefaultShapeDef()
+shapeId := bodyId.CreatePolygonShape(&shapeDef, &box)
+
+// Set filter
+filter := Filter{
+CategoryBits: 0x0002,
+MaskBits:     0x0004,
+GroupIndex:   -1,
+}
+shapeId.SetFilter(filter)
+
+// Get filter and verify
+gotFilter := shapeId.GetFilter()
+if gotFilter.CategoryBits != 0x0002 || gotFilter.MaskBits != 0x0004 || gotFilter.GroupIndex != -1 {
+t.Errorf("Filter not set correctly: %v", gotFilter)
+}
+}
+
+// TestSegmentShape tests segment (edge) shape creation
+func TestSegmentShape(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyId := worldId.CreateBody(&bodyDef)
+
+segment := Segment{
+Point1: Vec2{X: -1.0, Y: 0.0},
+Point2: Vec2{X: 1.0, Y: 0.0},
+}
+shapeDef := DefaultShapeDef()
+shapeId := bodyId.CreateSegmentShape(&shapeDef, &segment)
+
+if !shapeId.IsValid() {
+t.Error("Segment shape should be valid")
+}
+}
+
+// TestCapsuleShape tests capsule shape creation
+func TestCapsuleShape(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+bodyDef := DefaultBodyDef()
+bodyDef.Type = DynamicBody
+bodyId := worldId.CreateBody(&bodyDef)
+
+capsule := Capsule{
+Center1: Vec2{X: 0.0, Y: -0.5},
+Center2: Vec2{X: 0.0, Y: 0.5},
+Radius:  0.5,
+}
+shapeDef := DefaultShapeDef()
+shapeDef.Density = 1.0
+shapeId := bodyId.CreateCapsuleShape(&shapeDef, &capsule)
+
+if !shapeId.IsValid() {
+t.Error("Capsule shape should be valid")
+}
+}
+
+// TestMathFunctions tests vector math functions
+func TestMathFunctions(t *testing.T) {
+a := Vec2{X: 3.0, Y: 4.0}
+b := Vec2{X: 1.0, Y: 2.0}
+
+// Test Vec2Add
+sum := Vec2Add(a, b)
+if math.Abs(float64(sum.X-4.0)) > 0.001 || math.Abs(float64(sum.Y-6.0)) > 0.001 {
+t.Errorf("Vec2Add failed: expected (4, 6), got %v", sum)
+}
+
+// Test Vec2Sub
+diff := Vec2Sub(a, b)
+if math.Abs(float64(diff.X-2.0)) > 0.001 || math.Abs(float64(diff.Y-2.0)) > 0.001 {
+t.Errorf("Vec2Sub failed: expected (2, 2), got %v", diff)
+}
+
+// Test Vec2Length
+length := Vec2Length(a)
+expectedLength := float32(5.0) // sqrt(9+16) = 5
+if math.Abs(float64(length-expectedLength)) > 0.001 {
+t.Errorf("Vec2Length failed: expected %f, got %f", expectedLength, length)
+}
+
+// Test Vec2Normalize
+normalized := Vec2Normalize(a)
+normalizedLength := Vec2Length(normalized)
+if math.Abs(float64(normalizedLength-1.0)) > 0.001 {
+t.Errorf("Vec2Normalize failed: length should be 1.0, got %f", normalizedLength)
+}
+
+// Test Vec2Dot
+dot := Vec2Dot(a, b)
+expectedDot := float32(11.0) // 3*1 + 4*2 = 11
+if math.Abs(float64(dot-expectedDot)) > 0.001 {
+t.Errorf("Vec2Dot failed: expected %f, got %f", expectedDot, dot)
+}
+
+// Test Vec2Distance
+distance := Vec2Distance(a, b)
+expectedDistance := float32(math.Sqrt(8.0)) // sqrt((3-1)^2 + (4-2)^2) = sqrt(8)
+if math.Abs(float64(distance-expectedDistance)) > 0.001 {
+t.Errorf("Vec2Distance failed: expected %f, got %f", expectedDistance, distance)
+}
+}
+
+// TestRotationFunctions tests rotation functions
+func TestRotationFunctions(t *testing.T) {
+angle := float32(math.Pi / 4.0) // 45 degrees
+rot := MakeRot(angle)
+
+// Get angle back
+gotAngle := RotGetAngle(rot)
+if math.Abs(float64(gotAngle-angle)) > 0.001 {
+t.Errorf("RotGetAngle failed: expected %f, got %f", angle, gotAngle)
+}
+}
+
+// TestRaycasting tests raycasting
+func TestRaycasting(t *testing.T) {
+worldDef := DefaultWorldDef()
+worldId := CreateWorld(&worldDef)
+defer DestroyWorld(worldId)
+
+// Create a static box
+bodyDef := DefaultBodyDef()
+bodyDef.Position = Vec2{X: 5.0, Y: 0.0}
+bodyId := worldId.CreateBody(&bodyDef)
+
+box := MakeBox(1.0, 1.0)
+shapeDef := DefaultShapeDef()
+bodyId.CreatePolygonShape(&shapeDef, &box)
+
+// Cast a ray that should hit the box
+origin := Vec2{X: 0.0, Y: 0.0}
+translation := Vec2{X: 10.0, Y: 0.0}
+filter := QueryFilter{CategoryBits: 0xFFFFFFFFFFFFFFFF, MaskBits: 0xFFFFFFFFFFFFFFFF}
+
+result := worldId.CastRayClosest(origin, translation, filter)
+if result.Hit {
+t.Logf("Raycast hit at fraction %f, point (%f, %f)", result.Fraction, result.Point.X, result.Point.Y)
+}
+}
