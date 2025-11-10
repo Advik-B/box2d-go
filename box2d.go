@@ -82,13 +82,19 @@ type BodyId struct {
 
 // ShapeDef is the definition for creating a shape
 type ShapeDef struct {
-	Density  float32
-	Friction float32
+	Density     float32
+	Friction    float32
+	Restitution float32
 }
 
 // ShapeId is a handle to a Box2D shape
 type ShapeId struct {
 	id C.b2ShapeId
+}
+
+// JointId is a handle to a Box2D joint
+type JointId struct {
+	id C.b2JointId
 }
 
 // Circle represents a circle shape
@@ -180,8 +186,9 @@ func (b BodyId) SetTransform(position Vec2, angle float32) {
 func DefaultShapeDef() ShapeDef {
 	cDef := C.b2DefaultShapeDef()
 	return ShapeDef{
-		Density:  float32(cDef.density),
-		Friction: float32(cDef.material.friction),
+		Density:     float32(cDef.density),
+		Friction:    float32(cDef.material.friction),
+		Restitution: float32(cDef.material.restitution),
 	}
 }
 
@@ -198,6 +205,7 @@ func (b BodyId) CreateCircleShape(def *ShapeDef, circle *Circle) ShapeId {
 	cDef := C.b2DefaultShapeDef()
 	cDef.density = C.float(def.Density)
 	cDef.material.friction = C.float(def.Friction)
+	cDef.material.restitution = C.float(def.Restitution)
 	
 	cCircle := C.b2Circle{
 		center: C.b2Vec2{x: C.float(circle.Center.X), y: C.float(circle.Center.Y)},
@@ -219,6 +227,7 @@ func (b BodyId) CreatePolygonShape(def *ShapeDef, polygon *Polygon) ShapeId {
 	cDef := C.b2DefaultShapeDef()
 	cDef.density = C.float(def.Density)
 	cDef.material.friction = C.float(def.Friction)
+	cDef.material.restitution = C.float(def.Restitution)
 	
 	shapeId := C.b2CreatePolygonShape(b.id, &cDef, &polygon.cPoly)
 	return ShapeId{id: shapeId}
@@ -227,4 +236,21 @@ func (b BodyId) CreatePolygonShape(def *ShapeDef, polygon *Polygon) ShapeId {
 // DestroyShape destroys a shape
 func DestroyShape(shapeId ShapeId) {
 	C.b2DestroyShape(shapeId.id, C.bool(true))
+}
+
+// GetType returns the type of a body
+func (b BodyId) GetType() BodyType {
+	return BodyType(C.b2Body_GetType(b.id))
+}
+
+// SetLinearVelocity sets the linear velocity of a body
+func (b BodyId) SetLinearVelocity(velocity Vec2) {
+	cVel := C.b2Vec2{x: C.float(velocity.X), y: C.float(velocity.Y)}
+	C.b2Body_SetLinearVelocity(b.id, cVel)
+}
+
+// ApplyForceToCenter applies a force to the center of mass of a body
+func (b BodyId) ApplyForceToCenter(force Vec2, wake bool) {
+	cForce := C.b2Vec2{x: C.float(force.X), y: C.float(force.Y)}
+	C.b2Body_ApplyForceToCenter(b.id, cForce, C.bool(wake))
 }
