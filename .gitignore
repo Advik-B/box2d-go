@@ -1,10 +1,30 @@
+# Build artifacts
 build/
 imgui.ini
 settings.ini
-.vscode/
-.vs/
 .cap
-.DS_Store
 CMakeUserPresets.json
 .cache/
+
+# IDE files
+.vscode/
+.vs/
 .idea/
+*.swp
+*.swo
+*~
+
+# System files
+.DS_Store
+
+# Go binaries and test files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go workspace file
+go.work

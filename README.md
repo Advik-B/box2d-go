@@ -1,57 +1,28 @@
-# Box2D Go Bindings
+# Box2D Go Library
 
-This repository provides Go bindings for the [Box2D](https://github.com/erincatto/box2d) physics engine using CGO.
+Go bindings for the Box2D physics engine using CGO.
 
-## Structure
+## Overview
 
-- `box2d/` - Git submodule pointing to the upstream Box2D C library (for reference)
-- `go-box2d/` - Go bindings and wrapper library with vendored Box2D C source
+This library provides Go bindings to Box2D v3.2.0, a 2D physics engine for games. The bindings use CGO to interface with the native C library, which is automatically compiled when you build your project.
 
-## Box2D
+## Features
 
-Box2D is a 2D physics engine for games developed by Erin Catto.
+- World creation and simulation
+- Dynamic, static, and kinematic bodies
+- Circle and polygon (box) shapes
+- Physics stepping with configurable substeps
+- Collision detection and response
 
-[![Box2D Version 3.0 Release Demo](https://img.youtube.com/vi/dAoM-xjOWtA/0.jpg)](https://www.youtube.com/watch?v=dAoM-xjOWtA)
+## Installation
 
-### Features
-
-#### Collision
-- Continuous collision detection
-- Contact events
-- Convex polygons, capsules, circles, rounded polygons, segments, and chains
-- Multiple shapes per body
-- Collision filtering
-- Ray casts, shape casts, and overlap queries
-- Sensor system
-
-#### Physics
-- Robust _Soft Step_ rigid body solver
-- Continuous physics for fast translations and rotations
-- Island based sleep
-- Revolute, prismatic, distance, mouse joint, weld, and wheel joints
-- Joint limits, motors, springs, and friction
-- Joint and contact forces
-- Body movement events and sleep notification
-
-#### System
-- Data-oriented design
-- Written in portable C17
-- Extensive multithreading and SIMD
-- Optimized for large piles of bodies
-
-## Go Library
-
-This repository provides Go bindings for Box2D using CGO. The Go library is located in the `go-box2d/` directory.
-
-### Installation
-
-Simply import the library and build your project:
+Simply use `go get`:
 
 ```bash
 go get github.com/Advik-B/box2d-go
 ```
 
-That's it! The Box2D C library is automatically compiled when you build your Go project.
+The Box2D C library is automatically compiled when you build your Go project.
 
 ### Prerequisites
 
@@ -59,40 +30,121 @@ That's it! The Box2D C library is automatically compiled when you build your Go 
 - CGO enabled (default)
 - A C compiler (gcc, clang, msvc, etc.)
 
-### Quick Example
+No need for CMake or manual build steps!
+
+## Usage
+
+Here's a simple example that creates a world, adds a ground and a dynamic box, and runs the simulation:
 
 ```go
-import box2d "github.com/Advik-B/box2d-go"
+package main
 
-worldDef := box2d.DefaultWorldDef()
-worldDef.Gravity = box2d.Vec2{X: 0.0, Y: -10.0}
-worldId := box2d.CreateWorld(&worldDef)
-defer box2d.DestroyWorld(worldId)
+import (
+    "fmt"
+    box2d "github.com/Advik-B/box2d-go"
+)
 
-// Create bodies and shapes...
-worldId.Step(1.0/60.0, 4)
+func main() {
+    // Create a world with gravity
+    worldDef := box2d.DefaultWorldDef()
+    worldDef.Gravity = box2d.Vec2{X: 0.0, Y: -10.0}
+    worldId := box2d.CreateWorld(&worldDef)
+    defer box2d.DestroyWorld(worldId)
+
+    // Create ground body
+    groundBodyDef := box2d.DefaultBodyDef()
+    groundBodyDef.Position = box2d.Vec2{X: 0.0, Y: -10.0}
+    groundId := worldId.CreateBody(&groundBodyDef)
+
+    // Create ground shape (box)
+    groundBox := box2d.MakeBox(50.0, 10.0)
+    groundShapeDef := box2d.DefaultShapeDef()
+    groundId.CreatePolygonShape(&groundShapeDef, &groundBox)
+
+    // Create dynamic body
+    bodyDef := box2d.DefaultBodyDef()
+    bodyDef.Type = box2d.DynamicBody
+    bodyDef.Position = box2d.Vec2{X: 0.0, Y: 4.0}
+    bodyId := worldId.CreateBody(&bodyDef)
+
+    // Create dynamic box shape
+    dynamicBox := box2d.MakeBox(1.0, 1.0)
+    shapeDef := box2d.DefaultShapeDef()
+    shapeDef.Density = 1.0
+    shapeDef.Friction = 0.3
+    bodyId.CreatePolygonShape(&shapeDef, &dynamicBox)
+
+    // Simulate
+    timeStep := float32(1.0 / 60.0)
+    subStepCount := int32(4)
+
+    for i := 0; i < 60; i++ {
+        worldId.Step(timeStep, subStepCount)
+        position := bodyId.GetPosition()
+        angle := bodyId.GetAngle()
+        fmt.Printf("Step %d: pos=(%.2f, %.2f) angle=%.2f\n", i, position.X, position.Y, angle)
+    }
+}
 ```
 
-See [go-box2d/README.md](go-box2d/README.md) for detailed documentation and examples.
+## Testing
 
-## Documentation
+Run the tests with:
 
-- [Box2D Manual](https://box2d.org/documentation/)
-- [Box2D Migration Guide](https://github.com/erincatto/box2d/blob/main/docs/migration.md)
-- [Go Bindings Documentation](go-box2d/README.md)
+```bash
+go test -v
+```
 
-## Community
+## Examples
 
-- [Discord](https://discord.gg/NKYgCBP)
-- [GitHub Discussions](https://github.com/erincatto/box2d/discussions)
+The `examples/` directory contains sample programs demonstrating the library:
+
+### Hello World Example
+
+A simple falling box simulation:
+
+```bash
+go run examples/hello_world.go
+```
+
+### Stacking Example
+
+A stack of boxes settling under gravity:
+
+```bash
+go run examples/stacking.go
+```
+
+## API Overview
+
+### Types
+
+- `WorldId` - Handle to a physics world
+- `BodyId` - Handle to a rigid body
+- `ShapeId` - Handle to a shape
+- `Vec2` - 2D vector with X and Y components
+- `WorldDef` - World definition with gravity
+- `BodyDef` - Body definition with type, position, and angle
+- `ShapeDef` - Shape definition with density and friction
+- `BodyType` - Body type (StaticBody, KinematicBody, DynamicBody)
+
+### Key Functions
+
+- `CreateWorld(def *WorldDef) WorldId` - Create a physics world
+- `DestroyWorld(worldId WorldId)` - Destroy a world
+- `(w WorldId) Step(timeStep float32, subStepCount int32)` - Step the simulation
+- `(w WorldId) CreateBody(def *BodyDef) BodyId` - Create a body
+- `DestroyBody(bodyId BodyId)` - Destroy a body
+- `MakeBox(hx, hy float32) Polygon` - Create a box polygon
+- `MakeCircle(center Vec2, radius float32) Circle` - Create a circle
+- `(b BodyId) CreatePolygonShape(def *ShapeDef, polygon *Polygon) ShapeId` - Attach polygon to body
+- `(b BodyId) CreateCircleShape(def *ShapeDef, circle *Circle) ShapeId` - Attach circle to body
 
 ## License
 
-Box2D is developed by Erin Catto and uses the [MIT license](https://en.wikipedia.org/wiki/MIT_License).
-
-The Go bindings are also provided under the MIT license.
+This Go binding is provided under the MIT license. Box2D itself is also MIT licensed.
 
 ## Credits
 
-- Box2D physics engine: [Erin Catto](https://github.com/erincatto)
-- Go bindings: Contributors to this repository
+- Box2D physics engine by Erin Catto: https://box2d.org/
+- Go bindings by the Advik-B/box2d-go contributors
