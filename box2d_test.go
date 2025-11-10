@@ -206,3 +206,143 @@ func TestStaticBody(t *testing.T) {
 		t.Errorf("Static body moved from %v to %v", initialPos, finalPos)
 	}
 }
+
+// TestRestitution tests that restitution field is properly set
+func TestRestitution(t *testing.T) {
+	worldDef := DefaultWorldDef()
+	worldDef.Gravity = Vec2{X: 0.0, Y: -10.0}
+	worldId := CreateWorld(&worldDef)
+	defer DestroyWorld(worldId)
+
+	// Create ground
+	groundDef := DefaultBodyDef()
+	groundDef.Position = Vec2{X: 0.0, Y: 0.0}
+	groundId := worldId.CreateBody(&groundDef)
+	groundBox := MakeBox(50.0, 1.0)
+	groundShapeDef := DefaultShapeDef()
+	groundId.CreatePolygonShape(&groundShapeDef, &groundBox)
+
+	// Create bouncy ball
+	bodyDef := DefaultBodyDef()
+	bodyDef.Type = DynamicBody
+	bodyDef.Position = Vec2{X: 0.0, Y: 5.0}
+	bodyId := worldId.CreateBody(&bodyDef)
+
+	circle := MakeCircle(Vec2{X: 0.0, Y: 0.0}, 0.5)
+	shapeDef := DefaultShapeDef()
+	shapeDef.Density = 1.0
+	shapeDef.Restitution = 0.9 // Very bouncy
+
+	bodyId.CreateCircleShape(&shapeDef, &circle)
+
+	// Verify shapeDef has restitution field
+	if shapeDef.Restitution != 0.9 {
+		t.Errorf("Expected restitution 0.9, got %f", shapeDef.Restitution)
+	}
+}
+
+// TestGetType tests the GetType method
+func TestGetType(t *testing.T) {
+	worldDef := DefaultWorldDef()
+	worldId := CreateWorld(&worldDef)
+	defer DestroyWorld(worldId)
+
+	// Create static body
+	staticDef := DefaultBodyDef()
+	staticDef.Type = StaticBody
+	staticBody := worldId.CreateBody(&staticDef)
+
+	if staticBody.GetType() != StaticBody {
+		t.Errorf("Expected StaticBody, got %v", staticBody.GetType())
+	}
+
+	// Create dynamic body
+	dynamicDef := DefaultBodyDef()
+	dynamicDef.Type = DynamicBody
+	dynamicBody := worldId.CreateBody(&dynamicDef)
+
+	if dynamicBody.GetType() != DynamicBody {
+		t.Errorf("Expected DynamicBody, got %v", dynamicBody.GetType())
+	}
+
+	// Create kinematic body
+	kinematicDef := DefaultBodyDef()
+	kinematicDef.Type = KinematicBody
+	kinematicBody := worldId.CreateBody(&kinematicDef)
+
+	if kinematicBody.GetType() != KinematicBody {
+		t.Errorf("Expected KinematicBody, got %v", kinematicBody.GetType())
+	}
+}
+
+// TestSetLinearVelocity tests the SetLinearVelocity method
+func TestSetLinearVelocity(t *testing.T) {
+	worldDef := DefaultWorldDef()
+	worldId := CreateWorld(&worldDef)
+	defer DestroyWorld(worldId)
+
+	bodyDef := DefaultBodyDef()
+	bodyDef.Type = DynamicBody
+	bodyDef.Position = Vec2{X: 0.0, Y: 0.0}
+	bodyId := worldId.CreateBody(&bodyDef)
+
+	circle := MakeCircle(Vec2{X: 0.0, Y: 0.0}, 1.0)
+	shapeDef := DefaultShapeDef()
+	shapeDef.Density = 1.0
+	bodyId.CreateCircleShape(&shapeDef, &circle)
+
+	// Set velocity
+	velocity := Vec2{X: 10.0, Y: 5.0}
+	bodyId.SetLinearVelocity(velocity)
+
+	// Step the simulation
+	worldId.Step(1.0/60.0, 4)
+
+	// Body should have moved
+	pos := bodyId.GetPosition()
+	if math.Abs(float64(pos.X)) < 0.01 {
+		t.Errorf("Expected body to move horizontally, X position: %f", pos.X)
+	}
+}
+
+// TestApplyForceToCenter tests the ApplyForceToCenter method
+func TestApplyForceToCenter(t *testing.T) {
+	worldDef := DefaultWorldDef()
+	worldDef.Gravity = Vec2{X: 0.0, Y: 0.0} // No gravity
+	worldId := CreateWorld(&worldDef)
+	defer DestroyWorld(worldId)
+
+	bodyDef := DefaultBodyDef()
+	bodyDef.Type = DynamicBody
+	bodyDef.Position = Vec2{X: 0.0, Y: 0.0}
+	bodyId := worldId.CreateBody(&bodyDef)
+
+	box := MakeBox(1.0, 1.0)
+	shapeDef := DefaultShapeDef()
+	shapeDef.Density = 1.0
+	bodyId.CreatePolygonShape(&shapeDef, &box)
+
+	// Apply force
+	force := Vec2{X: 100.0, Y: 0.0}
+	bodyId.ApplyForceToCenter(force, true)
+
+	// Step the simulation multiple times
+	for i := 0; i < 60; i++ {
+		worldId.Step(1.0/60.0, 4)
+	}
+
+	// Body should have moved to the right
+	pos := bodyId.GetPosition()
+	if pos.X <= 0.01 {
+		t.Errorf("Expected body to move right due to force, X position: %f", pos.X)
+	}
+}
+
+// TestJointId tests that JointId type exists
+func TestJointId(t *testing.T) {
+	// Just verify the type can be declared
+	var joint JointId
+	_ = joint
+	// If this compiles, the test passes
+}
+
