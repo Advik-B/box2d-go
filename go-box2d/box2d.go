@@ -2,11 +2,45 @@
 package box2d
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../box2d/include -I${SRCDIR}/../box2d/src
-#cgo LDFLAGS: ${SRCDIR}/clib/libbox2d.a -lm
+#cgo CFLAGS: -I${SRCDIR}/box2d_vendor/include -I${SRCDIR}/box2d_vendor/src -std=c17 -D_POSIX_C_SOURCE=199309L
+#cgo LDFLAGS: -lm
 
 #include <box2d/box2d.h>
 #include <stdlib.h>
+#include "box2d_vendor/src/aabb.c"
+#include "box2d_vendor/src/arena_allocator.c"
+#include "box2d_vendor/src/array.c"
+#include "box2d_vendor/src/bitset.c"
+#include "box2d_vendor/src/body.c"
+#include "box2d_vendor/src/broad_phase.c"
+#include "box2d_vendor/src/constraint_graph.c"
+#include "box2d_vendor/src/contact.c"
+#include "box2d_vendor/src/contact_solver.c"
+#include "box2d_vendor/src/core.c"
+#include "box2d_vendor/src/distance.c"
+#include "box2d_vendor/src/distance_joint.c"
+#include "box2d_vendor/src/dynamic_tree.c"
+#include "box2d_vendor/src/geometry.c"
+#include "box2d_vendor/src/hull.c"
+#include "box2d_vendor/src/id_pool.c"
+#include "box2d_vendor/src/island.c"
+#include "box2d_vendor/src/joint.c"
+#include "box2d_vendor/src/manifold.c"
+#include "box2d_vendor/src/math_functions.c"
+#include "box2d_vendor/src/motor_joint.c"
+#include "box2d_vendor/src/mover.c"
+#include "box2d_vendor/src/physics_world.c"
+#include "box2d_vendor/src/prismatic_joint.c"
+#include "box2d_vendor/src/revolute_joint.c"
+#include "box2d_vendor/src/sensor.c"
+#include "box2d_vendor/src/shape.c"
+#include "box2d_vendor/src/solver.c"
+#include "box2d_vendor/src/solver_set.c"
+#include "box2d_vendor/src/table.c"
+#include "box2d_vendor/src/timer.c"
+#include "box2d_vendor/src/types.c"
+#include "box2d_vendor/src/weld_joint.c"
+#include "box2d_vendor/src/wheel_joint.c"
 */
 import "C"
 
