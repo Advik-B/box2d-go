@@ -97,6 +97,28 @@ Run the tests with:
 go test -v
 ```
 
+## Examples
+
+The `examples/` directory contains sample programs demonstrating the library:
+
+### Hello World Example
+
+A simple falling box simulation:
+
+```bash
+cd examples
+go run hello_world.go
+```
+
+### Stacking Example
+
+A stack of boxes settling under gravity:
+
+```bash
+cd examples
+go run stacking.go
+```
+
 ## API Overview
 
 ### Types
