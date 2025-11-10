@@ -67,6 +67,36 @@ Box2D is a 2D physics engine for games.
 - cmake --build . --config Release
 - cmake --install . (might need sudo)
 
+## Go Library
+
+This repository also includes Go bindings for Box2D using CGO. The Go library is located in the `go-box2d/` directory.
+
+### Using the Go Library
+
+```bash
+cd go-box2d/clib
+cmake .
+make
+cd ..
+go test -v
+```
+
+See [go-box2d/README.md](go-box2d/README.md) for detailed documentation and examples.
+
+Quick example:
+
+```go
+import box2d "github.com/Advik-B/box2d-go"
+
+worldDef := box2d.DefaultWorldDef()
+worldDef.Gravity = box2d.Vec2{X: 0.0, Y: -10.0}
+worldId := box2d.CreateWorld(&worldDef)
+defer box2d.DestroyWorld(worldId)
+
+// Create bodies and shapes...
+worldId.Step(1.0/60.0, 4)
+```
+
 ## Compatibility
 The Box2D library and samples build and run on Windows, Linux, and Mac.
 
