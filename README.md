@@ -1,16 +1,21 @@
-![Box2D Logo](https://box2d.org/images/logo.svg)
+# Box2D Go Bindings
 
-# Build Status
-[![Build Status](https://github.com/erincatto/box2d/actions/workflows/build.yml/badge.svg)](https://github.com/erincatto/box2d/actions)
+This repository provides Go bindings for the [Box2D](https://github.com/erincatto/box2d) physics engine using CGO.
 
-# Box2D 
-Box2D is a 2D physics engine for games.
+## Structure
+
+- `box2d/` - Git submodule pointing to the upstream Box2D C library
+- `go-box2d/` - Go bindings and wrapper library
+
+## Box2D
+
+Box2D is a 2D physics engine for games developed by Erin Catto.
 
 [![Box2D Version 3.0 Release Demo](https://img.youtube.com/vi/dAoM-xjOWtA/0.jpg)](https://www.youtube.com/watch?v=dAoM-xjOWtA)
 
-## Features
+### Features
 
-### Collision
+#### Collision
 - Continuous collision detection
 - Contact events
 - Convex polygons, capsules, circles, rounded polygons, segments, and chains
@@ -19,7 +24,7 @@ Box2D is a 2D physics engine for games.
 - Ray casts, shape casts, and overlap queries
 - Sensor system
 
-### Physics
+#### Physics
 - Robust _Soft Step_ rigid body solver
 - Continuous physics for fast translations and rotations
 - Island based sleep
@@ -28,62 +33,50 @@ Box2D is a 2D physics engine for games.
 - Joint and contact forces
 - Body movement events and sleep notification
 
-### System
+#### System
 - Data-oriented design
 - Written in portable C17
 - Extensive multithreading and SIMD
 - Optimized for large piles of bodies
 
-### Samples
-- OpenGL with GLFW and enkiTS
-- Graphical user interface with imgui
-- Many samples to demonstrate features and performance
-
-## Building for Visual Studio
-- Install [CMake](https://cmake.org/)
-- Ensure CMake is in the user `PATH`
-- Run `create_sln.bat`
-- Open and build `build/box2d.sln`
-
-## Building for Linux
-- Run `build.sh` from a bash shell
-- Results are in the build sub-folder
-
-## Building for Xcode
-- Install [CMake](https://cmake.org)
-- Add Cmake to the path in .zprofile (the default Terminal shell is zsh)
-    - export PATH="/Applications/CMake.app/Contents/bin:$PATH"
-- mkdir build
-- cd build
-- cmake -G Xcode ..
-- Open `box2d.xcodeproj`
-- Select the samples scheme
-- Build and run the samples
-
-## Building and installing
-- mkdir build
-- cd build
-- cmake ..
-- cmake --build . --config Release
-- cmake --install . (might need sudo)
-
 ## Go Library
 
-This repository also includes Go bindings for Box2D using CGO. The Go library is located in the `go-box2d/` directory.
+This repository provides Go bindings for Box2D using CGO. The Go library is located in the `go-box2d/` directory.
 
-### Using the Go Library
+### Getting Started
+
+1. Clone the repository with submodules:
+
+```bash
+git clone --recurse-submodules https://github.com/Advik-B/box2d-go.git
+cd box2d-go
+```
+
+2. Build the Box2D C library:
 
 ```bash
 cd go-box2d/clib
 cmake .
 make
+```
+
+3. Run tests:
+
+```bash
 cd ..
 go test -v
 ```
 
+4. Try the examples:
+
+```bash
+cd examples
+go run hello_world.go
+```
+
 See [go-box2d/README.md](go-box2d/README.md) for detailed documentation and examples.
 
-Quick example:
+### Quick Example
 
 ```go
 import box2d "github.com/Advik-B/box2d-go"
@@ -97,37 +90,24 @@ defer box2d.DestroyWorld(worldId)
 worldId.Step(1.0/60.0, 4)
 ```
 
-## Compatibility
-The Box2D library and samples build and run on Windows, Linux, and Mac.
-
-You will need a compiler that supports C17 to build the Box2D library.
-
-You will need a compiler that supports C++20 to build the samples.
-
-Box2D uses SSE2 and Neon SIMD math to improve performance. This can be disabled by defining `BOX2D_DISABLE_SIMD`.
-
 ## Documentation
-- [Manual](https://box2d.org/documentation/)
-- [Migration Guide](https://github.com/erincatto/box2d/blob/main/docs/migration.md)
+
+- [Box2D Manual](https://box2d.org/documentation/)
+- [Box2D Migration Guide](https://github.com/erincatto/box2d/blob/main/docs/migration.md)
+- [Go Bindings Documentation](go-box2d/README.md)
 
 ## Community
+
 - [Discord](https://discord.gg/NKYgCBP)
-
-## Contributing
-Please do not submit pull requests. Instead, please file an issue for bugs or feature requests. For support, please visit the Discord server.
-
-# Giving Feedback
-Please file an issue or start a chat on discord. You can also use [GitHub Discussions](https://github.com/erincatto/box2d/discussions).
+- [GitHub Discussions](https://github.com/erincatto/box2d/discussions)
 
 ## License
+
 Box2D is developed by Erin Catto and uses the [MIT license](https://en.wikipedia.org/wiki/MIT_License).
 
-## Sponsorship
-Support development of Box2D through [Github Sponsors](https://github.com/sponsors/erincatto).
+The Go bindings are also provided under the MIT license.
 
-Please consider starring this repository and subscribing to my [YouTube channel](https://www.youtube.com/@erin_catto).
+## Credits
 
-## External ports, wrappers, and bindings (unsupported)
-- Beef bindings - https://github.com/EnokViking/Box2DBeef
-- C++ bindings - https://github.com/HolyBlackCat/box2cpp
-- WASM - https://github.com/Birch-san/box2d3-wasm
+- Box2D physics engine: [Erin Catto](https://github.com/erincatto)
+- Go bindings: Contributors to this repository

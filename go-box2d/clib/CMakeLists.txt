@@ -8,18 +8,18 @@ if (MINGW OR APPLE OR UNIX)
 	add_compile_options(-ffp-contract=off)
 endif()
 
-# Box2D source files
+# Box2D source files from submodule
 file(GLOB BOX2D_SOURCE_FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/../../src/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../../box2d/src/*.c
 )
 
 # Create static library
 add_library(box2d STATIC ${BOX2D_SOURCE_FILES})
 
-# Include directories
+# Include directories from submodule
 target_include_directories(box2d PUBLIC
-	${CMAKE_CURRENT_SOURCE_DIR}/../../include
-	${CMAKE_CURRENT_SOURCE_DIR}/../../src
+	${CMAKE_CURRENT_SOURCE_DIR}/../../box2d/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../../box2d/src
 )
 
 # Set C standard

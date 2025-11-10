@@ -2,7 +2,7 @@
 package box2d
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../include -I${SRCDIR}/../src
+#cgo CFLAGS: -I${SRCDIR}/../box2d/include -I${SRCDIR}/../box2d/src
 #cgo LDFLAGS: ${SRCDIR}/clib/libbox2d.a -lm
 
 #include <box2d/box2d.h>
