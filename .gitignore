@@ -28,3 +28,4 @@ CMakeUserPresets.json
 
 # Go workspace file
 go.work
+.backup
